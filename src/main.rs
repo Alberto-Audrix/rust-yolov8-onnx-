@@ -4,6 +4,7 @@
 use std::fs::File;
 use std::io::{ErrorKind, Read, Write};
 use std::path::Path;
+use std::result;
 
 use rocket::fs::FileServer;
 use rocket::{data::ToByteUnit, Data};
@@ -38,7 +39,6 @@ async fn upload(content_type: &ContentType, data: Data<'_>) -> Result<Json<Uploa
     ::parse(content_type, data, options).await.unwrap();
 
     let image = multi_form_data.files.get("image");
-    let name = String::new();
     if let Some(file_fields) = image {
         let file_field = &file_fields[0];
         let content_type = &file_field.content_type;
@@ -56,13 +56,16 @@ async fn upload(content_type: &ContentType, data: Data<'_>) -> Result<Json<Uploa
         temp_file.read_to_end(&mut buffer)?;
         file.write_all(&buffer)?;
 
+        let result = inference(file_name.clone().unwrap());
+        // show result
+        println!("{:?}", result);
+
         return Ok(Json(UploadResponse {
             status: "Upload File Success".into(),
             file_name: file_name.clone().unwrap(),
         }));
 
     }
-    let _ = inference(name);
 
     Err(std::io::Error::new(ErrorKind::Other, "Upload Failed"))
 }

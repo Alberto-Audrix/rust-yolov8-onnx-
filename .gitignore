@@ -2,3 +2,5 @@
 Cargo.lock
 image
 image/*
+runs
+runs/*
