@@ -1,1 +1,4 @@
 target/
+runs/
+image/*
+crop/
